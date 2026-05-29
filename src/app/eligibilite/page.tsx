@@ -1,7 +1,7 @@
 import { EligibilityChecker } from "@/components/EligibilityChecker";
 
 export const metadata = {
-  title: "Test d'éligibilité — NaturaGE",
+  title: "Test d'éligibilité — MaNaturalisation",
   description:
     "Vérifiez en quelques questions si vous remplissez les conditions de la naturalisation ordinaire à Genève.",
 };

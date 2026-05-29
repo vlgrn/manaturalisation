@@ -9,7 +9,7 @@ export function SiteHeader() {
             ✚
           </span>
           <span className="text-lg tracking-tight">
-            Natura<span className="text-brand-500">GE</span>
+            Ma<span className="text-brand-500">Naturalisation</span>
           </span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">

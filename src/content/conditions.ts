@@ -14,7 +14,7 @@ export const CONDITIONS: ConditionGroup[] = [
     title: "Durée de résidence",
     items: [
       "10 ans de séjour en Suisse au bénéfice d'un titre de séjour valable, dont 3 sur les 5 dernières années.",
-      "Les années passées en Suisse entre 8 et 18 ans (révolus) comptent double — mais le séjour effectif doit être d'au moins 6 ans.",
+      "Les années passées en Suisse entre 8 et 18 ans (révolus) comptent double, mais le séjour effectif doit être d'au moins 6 ans.",
       "2 ans dans le canton de Genève, dont les 12 mois précédant immédiatement la demande.",
       "Rester effectivement domicilié·e à Genève pendant toute la procédure.",
       "Les absences à l'étranger de plus de 6 mois (parfois plus d'un an) peuvent annuler le temps comptabilisé.",
@@ -47,7 +47,7 @@ export const CONDITIONS: ConditionGroup[] = [
     items: [
       "Aucune aide sociale (Hospice général) perçue dans les 3 ans précédant la demande ni pendant la procédure, sauf remboursement intégral.",
       "Dettes ne dépassant pas CHF 1'500 au total.",
-      "Aucun retard de paiement d'impôt (quel que soit le montant) — un retard peut entraîner une décision de non-entrée en matière.",
+      "Aucun retard de paiement d'impôt (quel que soit le montant). Un retard peut entraîner une décision de non-entrée en matière.",
     ],
   },
 ];
@@ -56,4 +56,4 @@ export const EXEMPTION_NOTE =
   "Procédure dérogatoire : les personnes en situation personnelle particulière (handicap, maladie grave, troubles cognitifs liés à l'âge, illettrisme, travailleurs pauvres, lourdes charges familiales) peuvent bénéficier de conditions assouplies. Il faut contacter le service AVANT de déposer la demande.";
 
 export const DISCLAIMER =
-  "NaturaGE est un outil d'organisation personnel, pas un conseil juridique. Les informations proviennent des pages officielles de ge.ch et peuvent évoluer. Vérifiez toujours les conditions auprès du service cantonal des naturalisations avant de déposer votre dossier.";
+  "MaNaturalisation est un outil d'organisation personnel, pas un conseil juridique. Les informations proviennent des pages officielles de ge.ch et peuvent évoluer. Vérifiez toujours les conditions auprès du service cantonal des naturalisations avant de déposer votre dossier.";

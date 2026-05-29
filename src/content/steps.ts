@@ -33,7 +33,7 @@ export const STEPS: StepSpec[] = [
     number: 4,
     title: "Rassembler les documents",
     description:
-      "Collecter les 8 documents dans le bon ordre (séquenceur) pour qu'aucune attestation à courte validité ne périme avant l'envoi.",
+      "Collecter vos documents dans le bon ordre (séquenceur) — leur nombre varie selon votre situation — pour qu'aucune attestation à courte validité ne périme avant l'envoi.",
     actor: "you",
     parallelWith: ["test_language"],
   },
