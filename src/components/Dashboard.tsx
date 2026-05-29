@@ -7,6 +7,7 @@ import { hasPaid, markPaid } from "@/lib/payment";
 import { useUser, signOut } from "@/lib/useUser";
 import { useUserDocuments, type UserDoc } from "@/lib/useUserDocuments";
 import { supabaseConfigured } from "@/lib/env";
+import { trackOnce } from "@/lib/analytics";
 import { Paywall } from "@/components/Paywall";
 import { AuthForm } from "@/components/AuthForm";
 import { DocumentUpload } from "@/components/DocumentUpload";
@@ -73,6 +74,14 @@ export function Dashboard() {
     }
     setPaid(hasPaid());
   }, []);
+
+  // Ad conversion: an authenticated user reached the dashboard = a win.
+  // Fires once per user (Google or email login, or a returning session).
+  useEffect(() => {
+    if (user?.id) {
+      trackOnce("qualify_lead", `mn_conv_lead_${user.id}`, { method: "dashboard" });
+    }
+  }, [user?.id]);
 
   if (progress === null || paid === null || (supabaseConfigured && authLoading)) {
     return (
