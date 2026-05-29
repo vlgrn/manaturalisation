@@ -37,7 +37,7 @@ export default function HomePage() {
 
       {/* The expiry trap — the painful core insight */}
       <section className="border-b bg-background">
-        <HeroHighlight containerClassName="py-20 md:py-28">
+        <HeroHighlight containerClassName="py-16 md:py-28">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold leading-relaxed tracking-tight lg:text-5xl lg:leading-snug">
@@ -64,7 +64,9 @@ export default function HomePage() {
               ]}
             />
             <div className="flex items-center justify-center">
-              <span className="text-3xl text-muted-foreground">→</span>
+              <span className="inline-block rotate-90 text-3xl text-muted-foreground md:rotate-0">
+                →
+              </span>
             </div>
             <TrapCard
               tone="good"
@@ -84,8 +86,8 @@ export default function HomePage() {
       <Features />
 
       {/* Conditions + the free eligibility test (the lead magnet) */}
-      <section className="border-t py-20 md:py-28">
-        <div className="container grid items-start gap-12 lg:grid-cols-2 lg:gap-20">
+      <section className="border-t py-16 md:py-28">
+        <div className="container grid items-start gap-10 lg:grid-cols-2 lg:gap-20">
           {/* The pitch: take the free test */}
           <div className="lg:sticky lg:top-16">
             <h2 className="text-4xl font-semibold tracking-tight lg:text-6xl">
@@ -97,7 +99,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/eligibilite"
-              className="btn-primary group mt-7 inline-flex items-center gap-2 px-7 py-3.5 text-base"
+              className="btn-primary group mt-7 inline-flex w-full items-center justify-center gap-2 px-7 py-3.5 text-base sm:w-auto"
             >
               Tester mon éligibilité
               <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />

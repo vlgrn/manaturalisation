@@ -19,7 +19,7 @@ export function Faq({ items }: { items: FaqItem[] }) {
   };
 
   return (
-    <section id="faq" className="border-t bg-slate-50 py-20 md:py-28">
+    <section id="faq" className="border-t bg-slate-50 py-16 md:py-28">
       <div className="container max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink-500">
           FAQ

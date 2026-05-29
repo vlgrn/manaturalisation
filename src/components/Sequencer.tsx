@@ -23,7 +23,7 @@ export function Sequencer({
         <h2 className="font-semibold">Le bon ordre, pour ne rien laisser périmer</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-700">
           Commencez par les documents <strong>lents</strong> (acte d'état civil, certificat fide,
-          test) — ils prennent des semaines voire des mois mais ne périment pas. Gardez pour la fin
+          test) : ils prennent des semaines voire des mois mais ne périment pas. Gardez pour la fin
           les attestations à <strong>courte validité</strong> (impôts, poursuites, Hospice général,
           valables 3 mois). Ainsi, quand votre dossier est prêt, rien n'a expiré.
         </p>

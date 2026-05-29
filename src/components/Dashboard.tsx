@@ -141,7 +141,7 @@ function SafeMailBadge({
       <div className="mt-0.5 text-lg font-bold text-ink-900">{formatted}</div>
       <div className="text-xs text-ink-600">
         {blockers > 0
-          ? "Un document a expiré — à corriger."
+          ? "Un document a expiré, à corriger."
           : ready
             ? "Documents lents prêts : vous pouvez demander les attestations."
             : "En attente des documents lents."}

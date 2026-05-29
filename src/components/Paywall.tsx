@@ -38,7 +38,7 @@ export function Paywall({ progress }: { progress: UserProgress }) {
       </h1>
       <p className="mt-2 text-ink-700">
         Le séquenceur, les alertes anti-péremption, la date d'envoi sûre, les générateurs d'e-mail
-        et la frise des étapes — un seul paiement de {PRICE_CHF} CHF, à vie.
+        et la frise des étapes. Un seul paiement de {PRICE_CHF} CHF, à vie.
       </p>
 
       {/* Blurred preview */}

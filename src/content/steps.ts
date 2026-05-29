@@ -33,7 +33,7 @@ export const STEPS: StepSpec[] = [
     number: 4,
     title: "Rassembler les documents",
     description:
-      "Collecter vos documents dans le bon ordre (séquenceur) — leur nombre varie selon votre situation — pour qu'aucune attestation à courte validité ne périme avant l'envoi.",
+      "Collecter vos documents dans le bon ordre (séquenceur), leur nombre variant selon votre situation, pour qu'aucune attestation à courte validité ne périme avant l'envoi.",
     actor: "you",
     parallelWith: ["test_language"],
   },
@@ -72,7 +72,7 @@ export const STEPS: StepSpec[] = [
     number: 9,
     title: "Prestation de serment",
     description:
-      "Cérémonie de prestation de serment — obligatoire. Y renoncer sans motif valable peut annuler l'arrêté.",
+      "Cérémonie de prestation de serment, obligatoire. Y renoncer sans motif valable peut annuler l'arrêté.",
     actor: "you",
   },
   {

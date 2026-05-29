@@ -1,22 +1,32 @@
+import Link from "next/link";
 import { EligibilityChecker } from "@/components/EligibilityChecker";
 
 export const metadata = {
-  title: "Test d'éligibilité — MaNaturalisation",
+  title: "Test d'éligibilité · MaNaturalisation",
   description:
     "Vérifiez en quelques questions si vous remplissez les conditions de la naturalisation ordinaire à Genève.",
 };
 
 export default function EligibilitePage() {
   return (
-    <div className="container-page max-w-3xl py-12">
-      <h1 className="text-3xl font-bold tracking-tight">Suis-je éligible ?</h1>
-      <p className="mt-2 text-ink-700">
-        Répondez à ces questions sur votre situation. Le résultat est immédiat et gratuit. Aucune
-        donnée n'est envoyée tant que vous ne créez pas de compte.
-      </p>
-      <div className="mt-8">
+    <div className="container max-w-xl py-8 md:py-12">
+      <div className="mb-8 flex items-center justify-between">
+        <Link href="/" className="font-bold tracking-tight text-ink-900">
+          Ma<span className="text-brand-500">Naturalisation</span>
+        </Link>
+        <Link href="/" className="text-sm text-ink-500 transition hover:text-ink-900">
+          Accueil
+        </Link>
+      </div>
+
+      <div className="rounded-3xl border border-ink-300/50 bg-white p-6 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.25)] md:p-10">
         <EligibilityChecker />
       </div>
+
+      <p className="mt-5 text-center text-xs leading-relaxed text-ink-500">
+        Conditions basées sur les pages officielles de ge.ch. Outil d&apos;organisation,
+        pas un conseil juridique.
+      </p>
     </div>
   );
 }

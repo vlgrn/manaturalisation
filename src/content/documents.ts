@@ -138,7 +138,7 @@ export const DOCUMENTS: DocumentSpec[] = [
     name: "Consentement des représentants légaux + pièce d'identité (mineurs)",
     summary: "Uniquement pour les candidats mineurs.",
     detail:
-      "Consentement écrit des représentants légaux et copie de leur pièce d'identité. Concerne uniquement les mineurs — hors champ du parcours adulte v1.",
+      "Consentement écrit des représentants légaux et copie de leur pièce d'identité. Concerne uniquement les mineurs, hors champ du parcours adulte v1.",
     validityMonths: null,
     speed: "fast",
     estimatedWeeks: [0, 1],

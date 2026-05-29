@@ -32,7 +32,7 @@ export const Pricing6 = ({
   href = "/eligibilite",
 }: Pricing6Props) => {
   return (
-    <section id="prix" className="py-24">
+    <section id="prix" className="py-16 md:py-24">
       <div className="container">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center">
           <h2 className="text-pretty text-4xl font-semibold lg:text-6xl">{heading}</h2>

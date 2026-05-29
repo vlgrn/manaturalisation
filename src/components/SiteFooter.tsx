@@ -36,7 +36,7 @@ export function SiteFooter() {
           {DISCLAIMER}
         </p>
         <p className="mt-2 text-xs text-ink-500">
-          © {new Date().getFullYear()} MaNaturalisation. Sources : pages officielles de ge.ch.
+          © {new Date().getFullYear()} MaNaturalisation. 
         </p>
       </div>
     </footer>

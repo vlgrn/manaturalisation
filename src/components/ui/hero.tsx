@@ -177,12 +177,12 @@ export const PremiumHero = () => {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-48 bg-gradient-to-b from-transparent to-background" />
 
       <div className="relative z-20 flex min-h-[82vh] w-full items-center justify-center px-6 py-16 text-center">
-        <div className="container mx-auto flex flex-col items-center gap-7 text-center">
+        <div className="container mx-auto flex flex-col items-center gap-6 text-center sm:gap-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo-white.svg"
             alt="MaNaturalisation"
-            className="h-40 w-auto md:h-56"
+            className="h-28 w-auto sm:h-36 md:h-56"
           />
 
           <h1 className="max-w-4xl text-3xl font-semibold tracking-tighter text-white sm:text-4xl md:text-6xl">
@@ -210,8 +210,8 @@ export const PremiumHero = () => {
             qui coûte des mois.
           </p>
 
-          <div className="flex flex-row flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="gap-2">
+          <div className="flex w-full max-w-md flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center">
+            <Button asChild size="lg" className="w-full justify-center gap-2 sm:w-auto">
               <Link href="/eligibilite">
                 Tester mon éligibilité, gratuit <MoveRight className="h-4 w-4" />
               </Link>
@@ -220,9 +220,9 @@ export const PremiumHero = () => {
               asChild
               size="lg"
               variant="outline"
-              className="gap-2 border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              className="w-full justify-center gap-2 border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white sm:w-auto"
             >
-              <Link href="/#fonctionnement">Comment ça marche</Link>
+              <Link href="/tableau-de-bord">Accéder à mon dossier</Link>
             </Button>
           </div>
 

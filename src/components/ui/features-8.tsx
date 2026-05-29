@@ -5,7 +5,7 @@ import { CalendarClock, Lock, Mail, ListChecks } from "lucide-react";
 // focused on what actually de-risks the dossier for a Geneva applicant.
 export function Features() {
   return (
-    <section id="fonctionnement" className="bg-muted/40 py-20 md:py-32">
+    <section id="fonctionnement" className="bg-muted/40 py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-6">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight lg:text-5xl">

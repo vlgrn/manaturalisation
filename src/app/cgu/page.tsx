@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Conditions générales d'utilisation — MaNaturalisation",
+  title: "Conditions générales d'utilisation · MaNaturalisation",
   description:
     "Les conditions générales d'utilisation du service MaNaturalisation, outil d'organisation pour la naturalisation ordinaire à Genève.",
 };
@@ -107,7 +107,7 @@ export default function CguPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-foreground">
-            5. Outil d&apos;organisation — absence de conseil juridique
+            5. Outil d&apos;organisation : absence de conseil juridique
           </h2>
           <p className="font-semibold text-foreground">
             CETTE SECTION EST IMPORTANTE. MERCI DE LA LIRE ATTENTIVEMENT.
@@ -286,7 +286,7 @@ export default function CguPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-foreground">13. Contact</h2>
           <p>
-            MaNaturalisation — Genève, Suisse (adresse complète disponible sur demande).
+            MaNaturalisation, Genève, Suisse (adresse complète disponible sur demande).
             <br />
             E-mail :{" "}
             <a className="text-primary underline" href="mailto:contact@manaturalisation.ch">

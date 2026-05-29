@@ -28,7 +28,7 @@ export function CostsPanel() {
   return (
     <div className="space-y-6">
       <p className="text-sm text-ink-600">
-        Aperçu des coûts officiels. Les montants peuvent évoluer — vérifiez sur ge.ch avant le
+        Aperçu des coûts officiels. Les montants peuvent évoluer, vérifiez sur ge.ch avant le
         dépôt.
       </p>
       <div className="grid gap-6 md:grid-cols-2">

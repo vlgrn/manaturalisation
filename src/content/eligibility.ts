@@ -4,105 +4,105 @@ import type {
   EligibilityResult,
 } from "@/lib/types";
 
-// Guided eligibility questions for Geneva ordinary naturalisation (adults).
-// Source: ge.ch conditions. Last reviewed: 2026-02.
+// Guided eligibility questions for Geneva ORDINARY naturalisation (adults).
+// Conditions encoded from official sources, last reviewed 2026-05:
+//   - ge.ch/devenir-suisse/naturalisation-ordinaire-conditions-remplir
+//   - LN (RS 141.0) art. 9, 11, 12 ; OLN (RS 141.01) art. 6
+//   - LNat genevoise (RS-GE A 4 05)
+// Federal: 10 ans de séjour, dont 3 sur les 5 dernières années ; années entre
+// 8 et 18 ans comptées double mais séjour effectif >= 6 ans ; permis C exigé au
+// dépôt (B/F comptent pour la durée, F pour moitié ; L/N/S ne comptent pas).
+// Cantonal: 2 ans à Genève dont les 12 mois précédents. Langue: français B1
+// oral / A2 écrit. Finances: aucune aide sociale non remboursée sur 3 ans, pas
+// d'arriérés d'impôt, dettes <= CHF 1'500 (et pas de poursuites/ADB).
 export const ELIGIBILITY_QUESTIONS: EligibilityQuestion[] = [
   {
     key: "adult",
-    section: "residence",
-    question: "Êtes-vous majeur·e (18 ans ou plus) ?",
-    help: "Le parcours v1 couvre la naturalisation ordinaire des adultes.",
+    section: "permit",
+    question: "Avez-vous 18 ans ou plus ?",
+    help: "Cet outil couvre la naturalisation ordinaire des adultes.",
     type: "yesno",
   },
   {
     key: "permit",
     section: "permit",
-    question: "Quel est votre titre de séjour actuel ?",
+    question: "Quel est votre titre de séjour aujourd'hui ?",
     type: "choice",
     options: [
       { value: "C", label: "Permis C (établissement)" },
       { value: "B", label: "Permis B (séjour)" },
       { value: "F", label: "Permis F (admission provisoire)" },
       { value: "Ci", label: "Permis Ci" },
-      { value: "other", label: "Permis L / N / S / autre" },
+      { value: "other", label: "Permis L, N, S ou autre" },
     ],
-    help: "La naturalisation ordinaire exige un permis C valable durant toute la procédure.",
+    help: "Le permis C est exigé au moment du dépôt de la demande.",
   },
   {
     key: "yearsCH",
     section: "residence",
-    question: "Depuis combien d'années résidez-vous en Suisse au bénéfice d'un titre de séjour valable ?",
+    question: "Depuis combien d'années vivez-vous en Suisse ?",
+    help: "Au bénéfice d'un titre de séjour valable.",
     type: "number",
     unit: "ans",
   },
   {
     key: "years8to18",
     section: "residence",
-    question: "Parmi ces années, combien avez-vous passées en Suisse entre 8 et 18 ans ?",
-    help: "Ces années comptent double (le séjour effectif doit tout de même atteindre 6 ans).",
+    question: "Combien de ces années avez-vous vécues en Suisse entre 8 et 18 ans ?",
+    help: "Ces années comptent double, dans la limite d'un séjour effectif d'au moins 6 ans.",
     type: "number",
     unit: "ans",
   },
   {
     key: "last5in3",
     section: "residence",
-    question: "Avez-vous résidé en Suisse durant au moins 3 des 5 dernières années ?",
+    question: "Avez-vous vécu en Suisse au moins 3 des 5 dernières années ?",
     type: "yesno",
   },
   {
-    key: "yearsGE",
+    key: "geneva2y",
     section: "residence",
-    question: "Depuis combien d'années êtes-vous domicilié·e dans le canton de Genève ?",
-    type: "number",
-    unit: "ans",
-  },
-  {
-    key: "ge12months",
-    section: "residence",
-    question: "Avez-vous résidé à Genève pendant les 12 mois précédant immédiatement aujourd'hui ?",
+    question:
+      "Vivez-vous à Genève depuis au moins 2 ans, dont les 12 derniers mois sans interruption ?",
     type: "yesno",
   },
   {
     key: "longAbsence",
     section: "residence",
-    question: "Avez-vous eu une absence de Suisse de plus de 6 mois durant cette période ?",
+    question: "Avez-vous quitté la Suisse plus de 6 mois d'affilée sur cette période ?",
     type: "yesno",
   },
   {
     key: "language",
     section: "integration",
-    question: "Atteignez-vous le niveau de français B1 à l'oral et A2 à l'écrit (ou pouvez-vous le prouver) ?",
+    question: "Avez-vous le français au niveau B1 à l'oral et A2 à l'écrit ?",
+    help: "Prouvé par un certificat fide ou équivalent, ou par une scolarité suivie en français.",
     type: "yesno",
   },
   {
     key: "criminal",
     section: "integration",
-    question: "Avez-vous une inscription pertinente au casier judiciaire ?",
+    question: "Figurez-vous au casier judiciaire (extrait destiné aux autorités) ?",
     type: "yesno",
   },
   {
     key: "socialAid",
     section: "finances",
-    question: "Avez-vous perçu l'aide sociale (Hospice général) au cours des 3 dernières années (non remboursée) ?",
+    question:
+      "Avez-vous touché l'aide sociale (Hospice général) ces 3 dernières années sans l'avoir remboursée ?",
     type: "yesno",
   },
   {
     key: "taxDelay",
     section: "finances",
-    question: "Avez-vous des retards de paiement d'impôts (quel que soit le montant) ?",
+    question: "Avez-vous des arriérés ou des retards de paiement d'impôt ?",
     type: "yesno",
   },
   {
     key: "debts",
     section: "finances",
-    question: "Quel est le montant total de vos dettes / poursuites (CHF) ?",
-    type: "number",
-    unit: "CHF",
-  },
-  {
-    key: "selfSufficient",
-    section: "finances",
-    question: "Êtes-vous économiquement actif·ve ou en formation, et capable de subvenir à vos besoins ?",
+    question:
+      "Avez-vous plus de CHF 1'500 de dettes, des poursuites ou des actes de défaut de biens ?",
     type: "yesno",
   },
 ];
@@ -117,8 +117,24 @@ function bool(v: AnswerValue | undefined): boolean {
 }
 
 /**
+ * Whether a question should be shown given the current answers.
+ * The 8-18 double-counting question only matters when the effective stay is
+ * between 6 and 10 years (below 6 the floor fails anyway; 10+ already suffices).
+ */
+export function isQuestionVisible(
+  key: string,
+  answers: Record<string, AnswerValue>
+): boolean {
+  if (key === "years8to18") {
+    const y = num(answers.yearsCH);
+    return y >= 6 && y < 10;
+  }
+  return true;
+}
+
+/**
  * Evaluate eligibility. Conservative by design: hard blockers => "not_yet",
- * special situations => "edge_case", everything clear => "eligible".
+ * acquirable/special situations => "edge_case", everything clear => "eligible".
  */
 export function evaluateEligibility(
   answers: Record<string, AnswerValue>
@@ -132,52 +148,51 @@ export function evaluateEligibility(
     reasons.push({
       kind: "blocker",
       message:
-        "Le parcours v1 couvre la naturalisation ordinaire des adultes. Les mineurs relèvent d'une autre procédure.",
+        "Cet outil couvre la naturalisation ordinaire des adultes. Les mineurs relèvent d'une autre procédure.",
     });
-    edge = true;
+    blocked = true;
   }
 
   // --- Permit ---
   const permit = String(answers.permit ?? "");
   if (permit === "C") {
     reasons.push({ kind: "ok", message: "Permis C : condition de titre de séjour remplie." });
-  } else if (permit === "B" || permit === "Ci" || permit === "F") {
-    reasons.push({
-      kind: "blocker",
-      message:
-        "La naturalisation ordinaire exige un permis C. Vos années sous permis B/Ji comptent (le F pour moitié), mais vous devez obtenir le permis C avant de déposer.",
-    });
-    blocked = true;
   } else if (permit === "other") {
     reasons.push({
       kind: "blocker",
       message:
-        "Les permis L, N et S ne comptent pas et ne permettent pas la naturalisation ordinaire. Un permis C est requis.",
+        "Les permis L, N et S ne permettent pas la naturalisation ordinaire. Un permis C est requis.",
+    });
+    blocked = true;
+  } else if (permit) {
+    reasons.push({
+      kind: "blocker",
+      message:
+        "La naturalisation ordinaire exige un permis C au dépôt. Vos années sous permis B comptent (le F pour moitié), mais vous devez obtenir le permis C avant de déposer.",
     });
     blocked = true;
   }
 
-  // --- Residence (with double-counting age 8–18) ---
+  // --- Residence in Switzerland (double-counting ages 8-18, floor 6 years) ---
   const yearsCH = num(answers.yearsCH);
   const years8to18 = Math.min(num(answers.years8to18), yearsCH);
-  const countedYears = yearsCH + years8to18; // bonus year per 8–18 year
-  if (yearsCH < 6 && years8to18 > 0) {
+  const counted = yearsCH + years8to18;
+  if (yearsCH > 0 && yearsCH < 6) {
     reasons.push({
       kind: "blocker",
       message:
         "Le séjour effectif doit atteindre au moins 6 ans, même avec le double comptage des années entre 8 et 18 ans.",
     });
     blocked = true;
-  }
-  if (countedYears >= 10) {
+  } else if (counted >= 10) {
     reasons.push({
       kind: "ok",
-      message: `Durée de séjour comptabilisée ≈ ${countedYears} ans (≥ 10 requis).`,
+      message: `Durée de séjour comptabilisée d'environ ${counted} ans (10 requis).`,
     });
   } else {
     reasons.push({
       kind: "blocker",
-      message: `Durée de séjour comptabilisée ≈ ${countedYears} ans — 10 ans sont requis (les années entre 8 et 18 ans comptent double).`,
+      message: `Durée de séjour d'environ ${counted} ans. 10 ans sont requis (les années entre 8 et 18 ans comptent double).`,
     });
     blocked = true;
   }
@@ -185,43 +200,38 @@ export function evaluateEligibility(
   if (answers.last5in3 !== undefined && !bool(answers.last5in3)) {
     reasons.push({
       kind: "blocker",
-      message: "Il faut avoir résidé en Suisse durant au moins 3 des 5 dernières années.",
+      message: "Il faut avoir vécu en Suisse au moins 3 des 5 dernières années.",
     });
     blocked = true;
   }
 
-  const yearsGE = num(answers.yearsGE);
-  if (yearsGE >= 2) {
-    reasons.push({ kind: "ok", message: "Au moins 2 ans de domicile à Genève." });
-  } else {
+  // --- Residence in Geneva (2 years, incl. last 12 months) ---
+  if (answers.geneva2y !== undefined && !bool(answers.geneva2y)) {
     reasons.push({
       kind: "blocker",
-      message: "Il faut au moins 2 ans de domicile dans le canton de Genève.",
+      message:
+        "Il faut au moins 2 ans de domicile à Genève, dont les 12 mois précédant immédiatement la demande.",
     });
     blocked = true;
+  } else if (bool(answers.geneva2y)) {
+    reasons.push({ kind: "ok", message: "Domicile à Genève suffisant." });
   }
-  if (answers.ge12months !== undefined && !bool(answers.ge12months)) {
-    reasons.push({
-      kind: "blocker",
-      message: "Vous devez avoir résidé à Genève durant les 12 mois précédant immédiatement la demande.",
-    });
-    blocked = true;
-  }
+
   if (bool(answers.longAbsence)) {
     reasons.push({
       kind: "warning",
       message:
-        "Une absence de plus de 6 mois peut annuler le temps de séjour comptabilisé. À vérifier avec le service.",
+        "Une absence de plus de 6 mois peut annuler une partie du temps de séjour. À vérifier avec le service.",
     });
     edge = true;
   }
 
-  // --- Integration ---
+  // --- Integration (acquirable / to clarify) ---
   if (answers.language !== undefined && !bool(answers.language)) {
     reasons.push({
       kind: "warning",
       message:
-        "Le niveau de français B1 oral / A2 écrit est requis. Vous pouvez l'obtenir via un examen fide avant le dépôt.",
+        "Le français B1 à l'oral et A2 à l'écrit est requis. Vous pouvez l'obtenir via un examen fide avant le dépôt.",
     });
     edge = true;
   }
@@ -239,7 +249,7 @@ export function evaluateEligibility(
     reasons.push({
       kind: "blocker",
       message:
-        "Aucune aide sociale ne doit avoir été perçue (non remboursée) dans les 3 ans précédant la demande.",
+        "Aucune aide sociale non remboursée ne doit avoir été perçue dans les 3 ans précédant la demande.",
     });
     blocked = true;
   }
@@ -247,26 +257,17 @@ export function evaluateEligibility(
     reasons.push({
       kind: "blocker",
       message:
-        "Tout retard de paiement d'impôt (quel que soit le montant) peut entraîner une décision de non-entrée en matière.",
+        "Tout retard de paiement d'impôt peut entraîner une décision de non-entrée en matière.",
     });
     blocked = true;
   }
-  const debts = num(answers.debts);
-  if (debts > 1500) {
+  if (bool(answers.debts)) {
     reasons.push({
       kind: "blocker",
-      message: `Vos dettes (CHF ${debts}) dépassent le plafond de CHF 1'500.`,
+      message:
+        "Le total des dettes doit rester sous CHF 1'500, sans poursuite ni acte de défaut de biens.",
     });
     blocked = true;
-  } else if (debts > 0) {
-    reasons.push({ kind: "ok", message: "Dettes en dessous du plafond de CHF 1'500." });
-  }
-  if (answers.selfSufficient !== undefined && !bool(answers.selfSufficient)) {
-    reasons.push({
-      kind: "warning",
-      message: "Vous devez être économiquement autonome (actif·ve ou en formation).",
-    });
-    edge = true;
   }
 
   const verdict: EligibilityResult["verdict"] = blocked

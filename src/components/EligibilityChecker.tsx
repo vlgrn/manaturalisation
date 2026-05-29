@@ -2,13 +2,28 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  RotateCcw,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 import {
   ELIGIBILITY_QUESTIONS,
   evaluateEligibility,
+  isQuestionVisible,
 } from "@/content/eligibility";
 import { EXEMPTION_NOTE } from "@/content/conditions";
-import type { AnswerValue, EligibilityResult } from "@/lib/types";
+import type {
+  AnswerValue,
+  EligibilityQuestion,
+  EligibilityResult,
+} from "@/lib/types";
 import { loadProgress, saveProgress } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 
 const SECTION_LABELS: Record<string, string> = {
   residence: "Résidence",
@@ -19,207 +34,328 @@ const SECTION_LABELS: Record<string, string> = {
 
 export function EligibilityChecker() {
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
+  const [step, setStep] = useState(0);
   const [result, setResult] = useState<EligibilityResult | null>(null);
 
-  const total = ELIGIBILITY_QUESTIONS.length;
-  const answered = useMemo(
-    () => ELIGIBILITY_QUESTIONS.filter((q) => answers[q.key] !== undefined).length,
-    [answers]
+  const visible = useMemo(
+    () => ELIGIBILITY_QUESTIONS.filter((q) => isQuestionVisible(q.key, answers)),
+    [answers],
   );
-  const allAnswered = answered === total;
+  const current = visible[Math.min(step, visible.length - 1)];
 
-  function setAnswer(key: string, value: AnswerValue) {
-    setAnswers((prev) => ({ ...prev, [key]: value }));
+  function finish(state: Record<string, AnswerValue>) {
+    const r = evaluateEligibility(state);
+    setResult(r);
+    const progress = loadProgress();
+    progress.eligibilityAnswers = state;
+    progress.eligibilityResult = r;
+    saveProgress(progress);
+  }
+
+  function answer(value: AnswerValue) {
+    const q = current;
+    const next = { ...answers, [q.key]: value };
+    setAnswers(next);
+    const vis = ELIGIBILITY_QUESTIONS.filter((x) => isQuestionVisible(x.key, next));
+    if (step >= vis.length - 1) finish(next);
+    else setStep(step + 1);
+  }
+
+  function back() {
+    if (result) {
+      setResult(null);
+      return;
+    }
+    setStep((s) => Math.max(0, s - 1));
+  }
+
+  function reset() {
+    setAnswers({});
+    setStep(0);
     setResult(null);
   }
 
-  function onSubmit() {
-    const r = evaluateEligibility(answers);
-    setResult(r);
-    // Persist so the dashboard can reuse it.
-    const progress = loadProgress();
-    progress.eligibilityAnswers = answers;
-    progress.eligibilityResult = r;
-    saveProgress(progress);
-    // Scroll to result.
-    requestAnimationFrame(() => {
-      document.getElementById("resultat")?.scrollIntoView({ behavior: "smooth" });
-    });
+  if (result) {
+    return <ResultPanel result={result} onRestart={reset} />;
   }
 
-  // Group questions by section for display.
-  const sections = useMemo(() => {
-    const map = new Map<string, typeof ELIGIBILITY_QUESTIONS>();
-    for (const q of ELIGIBILITY_QUESTIONS) {
-      if (!map.has(q.section)) map.set(q.section, []);
-      map.get(q.section)!.push(q);
-    }
-    return Array.from(map.entries());
-  }, []);
+  const position = step + 1;
+  const totalApprox = visible.length;
+  const progress = Math.round((step / totalApprox) * 100);
 
   return (
-    <div>
+    <div className="flex min-h-[26rem] flex-col">
       {/* Progress */}
-      <div className="sticky top-16 z-10 -mx-4 mb-6 bg-white/90 px-4 py-3 backdrop-blur">
-        <div className="flex items-center justify-between text-sm text-ink-700">
-          <span>
-            {answered} / {total} questions
-          </span>
-          {allAnswered && <span className="text-brand-600 font-medium">Prêt à analyser</span>}
-        </div>
-        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-          <div
-            className="h-full rounded-full bg-brand-500 transition-all"
-            style={{ width: `${(answered / total) * 100}%` }}
-          />
-        </div>
+      <div className="flex items-center justify-between text-sm text-ink-500">
+        <span className="font-medium text-ink-700">
+          {SECTION_LABELS[current.section] ?? ""}
+        </span>
+        <span>
+          {position} / {totalApprox}
+        </span>
+      </div>
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-ink-300/40">
+        <motion.div
+          className="h-full rounded-full bg-brand-500"
+          initial={false}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        />
       </div>
 
-      <div className="space-y-8">
-        {sections.map(([section, questions]) => (
-          <fieldset key={section} className="space-y-4">
-            <legend className="text-sm font-semibold uppercase tracking-wide text-brand-600">
-              {SECTION_LABELS[section] ?? section}
-            </legend>
-            {questions.map((q) => (
-              <div key={q.key} className="card">
-                <label className="block font-medium text-ink-900">{q.question}</label>
-                {q.help && <p className="mt-1 text-sm text-ink-500">{q.help}</p>}
-                <div className="mt-3">
-                  {q.type === "yesno" && (
-                    <div className="flex gap-2">
-                      {[
-                        { v: true, label: "Oui" },
-                        { v: false, label: "Non" },
-                      ].map((opt) => (
-                        <button
-                          key={String(opt.v)}
-                          type="button"
-                          onClick={() => setAnswer(q.key, opt.v)}
-                          className={
-                            answers[q.key] === opt.v
-                              ? "btn-primary"
-                              : "btn-secondary"
-                          }
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {q.type === "choice" && (
-                    <div className="flex flex-wrap gap-2">
-                      {q.options?.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => setAnswer(q.key, opt.value)}
-                          className={
-                            answers[q.key] === opt.value ? "btn-primary" : "btn-secondary"
-                          }
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {q.type === "number" && (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min={0}
-                        inputMode="numeric"
-                        value={answers[q.key] === undefined ? "" : String(answers[q.key])}
-                        onChange={(e) =>
-                          setAnswer(q.key, e.target.value === "" ? "" : Number(e.target.value))
-                        }
-                        className="w-32 rounded-lg border border-ink-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
-                      />
-                      {q.unit && <span className="text-sm text-ink-500">{q.unit}</span>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </fieldset>
-        ))}
+      {/* Question */}
+      <div className="flex flex-1 flex-col justify-center py-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.key}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.28, ease: [0.22, 0.68, 0, 1] }}
+          >
+            <h2 className="text-2xl font-semibold leading-snug tracking-tight text-ink-900 md:text-3xl">
+              {current.question}
+            </h2>
+            {current.help && (
+              <p className="mt-3 max-w-lg text-ink-500">{current.help}</p>
+            )}
+
+            <div className="mt-8">
+              <AnswerControls
+                question={current}
+                value={answers[current.key]}
+                onAnswer={answer}
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      <div className="mt-8">
-        <button onClick={onSubmit} disabled={!allAnswered} className="btn-primary px-6 py-3 text-base">
-          Analyser mon éligibilité
+      {/* Nav */}
+      <div className="flex items-center justify-between border-t border-ink-300/40 pt-5">
+        <button
+          type="button"
+          onClick={back}
+          disabled={step === 0}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-900 disabled:opacity-0"
+        >
+          <ArrowLeft className="size-4" />
+          Retour
         </button>
-        {!allAnswered && (
-          <p className="mt-2 text-sm text-ink-500">
-            Répondez à toutes les questions pour obtenir votre résultat.
-          </p>
-        )}
+        <span className="text-xs text-ink-500">
+          Réponse immédiate, sans inscription.
+        </span>
       </div>
-
-      {result && <ResultPanel result={result} />}
     </div>
   );
 }
 
-function ResultPanel({ result }: { result: EligibilityResult }) {
-  const verdictMeta = {
-    eligible: {
-      title: "Vous semblez éligible 🎉",
-      blurb:
-        "D'après vos réponses, vous remplissez les conditions principales. Lancez le suivi de votre dossier pour rassembler vos documents dans le bon ordre.",
-      cls: "border-emerald-200 bg-emerald-50",
-      pill: "bg-emerald-100 text-emerald-700",
-    },
-    not_yet: {
-      title: "Pas encore éligible",
-      blurb:
-        "Un ou plusieurs critères bloquants ne sont pas remplis aujourd'hui. Voyez ci-dessous ce qui doit évoluer avant de pouvoir déposer.",
-      cls: "border-amber-200 bg-amber-50",
-      pill: "bg-amber-100 text-amber-800",
-    },
-    edge_case: {
-      title: "Cas particulier — à clarifier",
-      blurb:
-        "Votre situation comporte des points à vérifier directement avec le service des naturalisations avant de déposer.",
-      cls: "border-sky-200 bg-sky-50",
-      pill: "bg-sky-100 text-sky-800",
-    },
-  }[result.verdict];
+function AnswerControls({
+  question,
+  value,
+  onAnswer,
+}: {
+  question: EligibilityQuestion;
+  value: AnswerValue | undefined;
+  onAnswer: (v: AnswerValue) => void;
+}) {
+  const [draft, setDraft] = useState(value === undefined ? "" : String(value));
+
+  if (question.type === "yesno") {
+    return (
+      <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+        {[
+          { v: true, label: "Oui" },
+          { v: false, label: "Non" },
+        ].map((opt) => (
+          <OptionButton
+            key={String(opt.v)}
+            selected={value === opt.v}
+            onClick={() => onAnswer(opt.v)}
+          >
+            {opt.label}
+          </OptionButton>
+        ))}
+      </div>
+    );
+  }
+
+  if (question.type === "choice") {
+    return (
+      <div className="flex flex-col gap-2.5 sm:max-w-md">
+        {question.options?.map((opt) => (
+          <OptionButton
+            key={opt.value}
+            selected={value === opt.value}
+            onClick={() => onAnswer(opt.value)}
+            align="left"
+          >
+            {opt.label}
+          </OptionButton>
+        ))}
+      </div>
+    );
+  }
+
+  // number
+  const submit = () => {
+    if (draft === "") return;
+    onAnswer(Number(draft));
+  };
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center rounded-xl border border-ink-300 bg-white px-1 focus-within:border-brand-500">
+        <input
+          type="number"
+          min={0}
+          autoFocus
+          inputMode="numeric"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          className="w-24 bg-transparent px-3 py-3 text-lg outline-none"
+        />
+        {question.unit && (
+          <span className="pr-3 text-sm text-ink-500">{question.unit}</span>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={submit}
+        disabled={draft === ""}
+        className="btn-primary inline-flex items-center gap-2 px-6 py-3 disabled:opacity-40"
+      >
+        Continuer
+        <ArrowRight className="size-4" />
+      </button>
+    </div>
+  );
+}
+
+function OptionButton({
+  children,
+  selected,
+  onClick,
+  align = "center",
+}: {
+  children: React.ReactNode;
+  selected: boolean;
+  onClick: () => void;
+  align?: "center" | "left";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "rounded-xl border px-5 py-3.5 text-base font-medium transition-all duration-150",
+        align === "left" ? "text-left" : "text-center",
+        selected
+          ? "border-brand-500 bg-brand-500 text-white shadow-sm"
+          : "border-ink-300 bg-white text-ink-900 hover:border-brand-500 hover:bg-brand-50",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+const VERDICT = {
+  eligible: {
+    title: "Vous semblez éligible",
+    blurb:
+      "D'après vos réponses, vous remplissez les conditions principales. Lancez le suivi pour rassembler vos documents dans le bon ordre.",
+    accent: "text-emerald-600",
+    cta: "Lancer le suivi de mon dossier",
+  },
+  not_yet: {
+    title: "Pas encore éligible",
+    blurb:
+      "Un ou plusieurs critères ne sont pas remplis aujourd'hui. Voici ce qui doit évoluer avant de pouvoir déposer.",
+    accent: "text-brand-600",
+    cta: "Voir le suivi (aperçu)",
+  },
+  edge_case: {
+    title: "Un point à clarifier",
+    blurb:
+      "Votre situation comporte des éléments à vérifier avec le service des naturalisations avant de déposer.",
+    accent: "text-amber-600",
+    cta: "Voir le suivi (aperçu)",
+  },
+} as const;
+
+function ResultPanel({
+  result,
+  onRestart,
+}: {
+  result: EligibilityResult;
+  onRestart: () => void;
+}) {
+  const meta = VERDICT[result.verdict];
+  const issues = result.reasons.filter((r) => r.kind !== "ok");
 
   return (
-    <div id="resultat" className={`card mt-10 ${verdictMeta.cls}`}>
-      <span className={`badge ${verdictMeta.pill}`}>Résultat</span>
-      <h2 className="mt-3 text-2xl font-bold">{verdictMeta.title}</h2>
-      <p className="mt-2 text-ink-700">{verdictMeta.blurb}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 0.68, 0, 1] }}
+    >
+      <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink-500">
+        Résultat
+      </p>
+      <h2 className={cn("mt-2 text-3xl font-semibold tracking-tight", meta.accent)}>
+        {meta.title}
+      </h2>
+      <p className="mt-3 max-w-xl text-ink-700">{meta.blurb}</p>
 
-      <ul className="mt-5 space-y-2">
-        {result.reasons.map((r, i) => (
-          <li key={i} className="flex gap-2 text-sm">
-            <span aria-hidden>
-              {r.kind === "blocker" ? "⛔" : r.kind === "warning" ? "⚠️" : "✅"}
-            </span>
-            <span className="text-ink-800">{r.message}</span>
-          </li>
-        ))}
-      </ul>
-
-      {result.verdict === "edge_case" && (
-        <p className="mt-5 rounded-lg bg-white/70 p-3 text-sm text-ink-700">{EXEMPTION_NOTE}</p>
+      {issues.length > 0 ? (
+        <ul className="mt-7 space-y-3">
+          {issues.map((r, i) => (
+            <li key={i} className="flex gap-3 text-sm">
+              <span
+                className={cn(
+                  "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full",
+                  r.kind === "blocker"
+                    ? "bg-brand-100 text-brand-600"
+                    : "bg-amber-100 text-amber-600",
+                )}
+              >
+                {r.kind === "blocker" ? (
+                  <X className="size-3.5" strokeWidth={2.5} />
+                ) : (
+                  <TriangleAlert className="size-3" strokeWidth={2.5} />
+                )}
+              </span>
+              <span className="text-ink-800">{r.message}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-7 flex items-center gap-2 text-sm font-medium text-emerald-600">
+          <Check className="size-4" strokeWidth={2.5} />
+          Aucun obstacle détecté sur les critères vérifiés.
+        </p>
       )}
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/tableau-de-bord" className="btn-primary">
-          {result.verdict === "eligible" ? "Lancer le suivi de mon dossier" : "Voir le suivi (aperçu)"}
+      {result.verdict === "edge_case" && (
+        <p className="mt-6 rounded-xl border border-ink-300/50 bg-slate-50 p-4 text-sm leading-relaxed text-ink-600">
+          {EXEMPTION_NOTE}
+        </p>
+      )}
+
+      <div className="mt-8 flex flex-wrap items-center gap-4">
+        <Link href="/tableau-de-bord" className="btn-primary px-6 py-3">
+          {meta.cta}
         </Link>
-        <a
-          href="https://www.ge.ch/naturalisation-suisse-personnes-etrangeres"
-          target="_blank"
-          rel="noreferrer"
-          className="btn-secondary"
+        <button
+          type="button"
+          onClick={onRestart}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-900"
         >
-          Page officielle ge.ch
-        </a>
+          <RotateCcw className="size-4" />
+          Recommencer
+        </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
