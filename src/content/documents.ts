@@ -21,8 +21,8 @@ export const DOCUMENTS: DocumentSpec[] = [
     sequenceGroup: "slow_first",
     action: {
       type: "link",
-      label: "Trouver votre arrondissement de l'état civil",
-      href: "https://www.ge.ch/organisation/office-cantonal-population-migrations-ocpm",
+      label: "Commander l'acte d'état civil",
+      href: "https://www.ge.ch/actes-etat-civil-suisses-etrangers",
     },
   },
   {
@@ -112,7 +112,7 @@ export const DOCUMENTS: DocumentSpec[] = [
     action: {
       type: "link",
       label: "S'inscrire à un examen fide / faire reconnaître un diplôme",
-      href: "https://www.fide-info.ch/fr/fide/examen",
+      href: "https://fide-info.ch/fr/",
     },
   },
   {
@@ -121,15 +121,15 @@ export const DOCUMENTS: DocumentSpec[] = [
     name: "Attestation de réussite du test de connaissances",
     summary: "Preuve de réussite du test sur la Suisse et Genève.",
     detail:
-      "Atteste vos connaissances sur la géographie, l'histoire, la politique et la société suisses et genevoises. L'inscription se fait via le service des naturalisations (téléphone / formulaire), puis vous passez le test. À engager TÔT : l'inscription et l'obtention d'une date prennent du temps.",
+      "Atteste vos connaissances sur la géographie, l'histoire, la politique et la société suisses et genevoises. Préparez-vous avec le didacticiel officiel « Connaître la Suisse et Genève » (modules + quiz). L'inscription au test se fait auprès du service des naturalisations (tél. +41 22 546 46 20, du lundi au vendredi de 9h à 12h, ou via le formulaire de contact). À engager TÔT : l'obtention d'une date prend du temps.",
     validityMonths: null,
     speed: "slow",
     estimatedWeeks: [4, 12],
     sequenceGroup: "slow_first",
     action: {
       type: "link",
-      label: "S'inscrire au test de connaissances",
-      href: "https://www.ge.ch/naturalisation-suisse-personnes-etrangeres",
+      label: "Préparer et s'inscrire au test",
+      href: "https://www.ge.ch/connaitre-suisse-geneve",
     },
   },
   {

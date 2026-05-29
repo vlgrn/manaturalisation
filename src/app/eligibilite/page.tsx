@@ -11,8 +11,9 @@ export default function EligibilitePage() {
   return (
     <div className="container max-w-xl py-8 md:py-12">
       <div className="mb-8 flex items-center justify-between">
-        <Link href="/" className="font-bold tracking-tight text-ink-900">
-          Ma<span className="text-brand-500">Naturalisation</span>
+        <Link href="/" aria-label="MaNaturalisation, accueil" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="MaNaturalisation" className="h-20 w-auto" />
         </Link>
         <Link href="/" className="text-sm text-ink-500 transition hover:text-ink-900">
           Accueil

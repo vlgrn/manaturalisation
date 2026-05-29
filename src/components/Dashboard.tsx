@@ -1,44 +1,71 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useProgress } from "@/lib/useProgress";
 import { hasPaid, markPaid } from "@/lib/payment";
+import { useUser, signOut } from "@/lib/useUser";
+import { supabaseConfigured } from "@/lib/env";
 import { Paywall } from "@/components/Paywall";
-import { DocumentTracker } from "@/components/DocumentTracker";
-import { Sequencer } from "@/components/Sequencer";
+import { GoogleSignIn } from "@/components/GoogleSignIn";
+import { DocRow } from "@/components/DocRow";
 import { StepTimeline } from "@/components/StepTimeline";
 import { CostsPanel } from "@/components/CostsPanel";
-import { computeSequence } from "@/lib/sequencer";
+import { ADULT_DOCUMENTS } from "@/content/documents";
+import { computeSequence, formatDate } from "@/lib/sequencer";
+import type { DocumentSpec, UserProgress } from "@/lib/types";
 
-type Tab = "sequenceur" | "documents" | "etapes" | "couts";
-
-const TABS: { key: Tab; label: string }[] = [
-  { key: "sequenceur", label: "Séquenceur" },
-  { key: "documents", label: "Documents" },
-  { key: "etapes", label: "Étapes" },
-  { key: "couts", label: "Coûts" },
+const RUBRIQUES = [
+  { key: "now", label: "À commencer maintenant" },
+  { key: "last", label: "À demander en dernier" },
+  { key: "info", label: "Procédure & coûts" },
 ];
+
+function SignInGate() {
+  return (
+    <div className="container-page flex min-h-[70vh] max-w-md flex-col items-center justify-center py-12 text-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo.svg" alt="MaNaturalisation" className="h-24 w-auto" />
+      <h1 className="mt-6 text-2xl font-semibold tracking-tight text-ink-900">
+        Accédez à votre dossier
+      </h1>
+      <p className="mt-2 text-ink-600">
+        Connectez-vous pour retrouver le suivi de vos documents, en sécurité.
+      </p>
+      <div className="mt-8 w-full">
+        <GoogleSignIn next="/tableau-de-bord" />
+      </div>
+      <p className="mt-4 text-xs text-ink-500">
+        Aucune donnée n&apos;est partagée avec l&apos;administration.
+      </p>
+    </div>
+  );
+}
 
 export function Dashboard() {
   const { progress, setDocStatus, setDocDate, setStepStatus } = useProgress();
-  const [tab, setTab] = useState<Tab>("sequenceur");
+  const { user, loading: authLoading } = useUser();
   const [paid, setPaid] = useState<boolean | null>(null);
+  const [tab, setTab] = useState<string>("now");
 
-  // On mount: honour ?paid=1 returned from Stripe Checkout, then read access.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("paid") === "1") {
       markPaid();
-      // Clean the URL.
       window.history.replaceState({}, "", window.location.pathname);
     }
     setPaid(hasPaid());
   }, []);
 
-  if (progress === null || paid === null) {
+  if (progress === null || paid === null || (supabaseConfigured && authLoading)) {
     return (
       <div className="container-page py-20 text-center text-ink-500">Chargement…</div>
     );
+  }
+
+  // Google sign-in gate (only when Supabase is configured).
+  if (supabaseConfigured && !user) {
+    return <SignInGate />;
   }
 
   if (!paid) {
@@ -46,106 +73,248 @@ export function Dashboard() {
   }
 
   const seq = computeSequence(progress);
-  const blockers = seq.warnings.filter((w) => w.level === "block").length;
+  const isObtained = (d: DocumentSpec) =>
+    (progress.documents[d.key]?.status ?? "not_started") === "obtained";
+
+  const obtainedCount = ADULT_DOCUMENTS.filter(isObtained).length;
+  const total = ADULT_DOCUMENTS.length;
+
+  const startNow = [...seq.startNow, ...seq.anytime];
+  const requestLast = seq.requestLast;
+  const slowReady = seq.slowDocsReady;
+  const allDone = obtainedCount === total;
 
   return (
-    <div className="container-page py-10">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mon dossier</h1>
-          <p className="mt-1 text-ink-700">
-            Avancez dans le bon ordre. Vos données sont enregistrées sur cet appareil.
-          </p>
+    <div className="container-page max-w-6xl py-8 md:py-12">
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <Link href="/" aria-label="MaNaturalisation, accueil" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="MaNaturalisation" className="h-20 w-auto" />
+        </Link>
+        <div className="flex items-center gap-4">
+          {user && (
+            <>
+              <span className="hidden text-sm text-ink-500 sm:inline">{user.email}</span>
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="text-sm font-medium text-ink-500 transition hover:text-ink-900"
+              >
+                Se déconnecter
+              </button>
+            </>
+          )}
+          <Link href="/" className="text-sm text-ink-500 transition hover:text-ink-900">
+            Accueil
+          </Link>
         </div>
-        {seq.earliestSafeMailDate && (
-          <SafeMailBadge
-            date={seq.earliestSafeMailDate}
-            ready={seq.slowDocsReady}
-            blockers={blockers}
-          />
-        )}
       </div>
 
-      {/* Tabs */}
-      <div className="mt-8 flex gap-1 overflow-x-auto border-b border-ink-300/50">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`relative whitespace-nowrap px-4 py-2.5 text-sm font-medium transition ${
-              tab === t.key
-                ? "text-brand-600"
-                : "text-ink-500 hover:text-ink-900"
-            }`}
-          >
-            {t.label}
-            {t.key === "sequenceur" && blockers > 0 && (
-              <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1 text-xs font-bold text-white">
-                {blockers}
-              </span>
-            )}
-            {tab === t.key && (
-              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-brand-500" />
-            )}
-          </button>
-        ))}
-      </div>
+      <h1 className="text-3xl font-semibold tracking-tight text-ink-900">Mon dossier</h1>
+      <p className="mt-2 max-w-2xl text-ink-600">
+        Suivez l&apos;ordre indiqué pour qu&apos;aucun document ne périme avant l&apos;envoi.
+        Tout est enregistré sur cet appareil.
+      </p>
 
-      <div className="mt-8">
-        {tab === "sequenceur" && (
-          <Sequencer progress={progress} onSetStatus={setDocStatus} />
-        )}
-        {tab === "documents" && (
-          <DocumentTracker
-            progress={progress}
-            onSetStatus={setDocStatus}
-            onSetDate={setDocDate}
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[340px_1fr] lg:gap-12">
+        {/* Left: summary, sticky */}
+        <div className="lg:sticky lg:top-8">
+          <StatusBanner
+            expired={seq.expired}
+            nextDoc={startNow.find((d) => !isObtained(d))}
+            slowReady={slowReady}
+            allDone={allDone}
+            safeDate={seq.earliestSafeMailDate}
+            obtainedCount={obtainedCount}
+            total={total}
           />
-        )}
-        {tab === "etapes" && (
-          <StepTimeline progress={progress} onSetStatus={setStepStatus} />
-        )}
-        {tab === "couts" && <CostsPanel />}
+        </div>
+
+        {/* Right: rubriques (one open at a time, no long scroll) */}
+        <div>
+          <div className="flex gap-1 overflow-x-auto border-b border-ink-300/50">
+            {RUBRIQUES.map((r) => (
+              <button
+                key={r.key}
+                type="button"
+                onClick={() => setTab(r.key)}
+                className={`relative whitespace-nowrap px-4 py-2.5 text-sm font-medium transition ${
+                  tab === r.key ? "text-brand-600" : "text-ink-500 hover:text-ink-900"
+                }`}
+              >
+                {r.label}
+                {tab === r.key && (
+                  <span className="absolute inset-x-0 -bottom-px h-0.5 bg-brand-500" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6">
+            {tab === "now" && (
+              <Group
+                index={1}
+                title="À commencer maintenant"
+                hint="Ces documents prennent le plus de temps mais ne périment pas. Lancez-les tout de suite, en parallèle."
+              >
+                {startNow.map((doc) => (
+                  <DocRow
+                    key={doc.key}
+                    doc={doc}
+                    prog={progress.documents[doc.key] ?? { status: "not_started" }}
+                    onSetStatus={setDocStatus}
+                    onSetDate={setDocDate}
+                  />
+                ))}
+              </Group>
+            )}
+
+            {tab === "last" && (
+              <Group
+                index={2}
+                title="À demander en dernier"
+                hint={
+                  slowReady
+                    ? "Vos documents longs sont prêts. Vous pouvez demander ces attestations : elles ne valent que 3 mois."
+                    : "Attendez d'avoir obtenu les documents de l'étape 1. Ces attestations ne valent que 3 mois et périmeraient avant l'envoi."
+                }
+                locked={!slowReady}
+              >
+                {requestLast.map((doc) => (
+                  <DocRow
+                    key={doc.key}
+                    doc={doc}
+                    prog={progress.documents[doc.key] ?? { status: "not_started" }}
+                    onSetStatus={setDocStatus}
+                    onSetDate={setDocDate}
+                    muted={!slowReady && (progress.documents[doc.key]?.status ?? "not_started") === "not_started"}
+                  />
+                ))}
+              </Group>
+            )}
+
+            {tab === "info" && (
+              <div className="space-y-10">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink-900">
+                    Les étapes de la procédure
+                  </h2>
+                  <div className="mt-4">
+                    <StepTimeline progress={progress} onSetStatus={setStepStatus} />
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-ink-900">Les coûts officiels</h2>
+                  <div className="mt-4">
+                    <CostsPanel />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function SafeMailBadge({
-  date,
-  ready,
-  blockers,
+function StatusBanner({
+  expired,
+  nextDoc,
+  slowReady,
+  allDone,
+  safeDate,
+  obtainedCount,
+  total,
 }: {
-  date: Date;
-  ready: boolean;
-  blockers: number;
+  expired: DocumentSpec[];
+  nextDoc?: DocumentSpec;
+  slowReady: boolean;
+  allDone: boolean;
+  safeDate?: Date;
+  obtainedCount: number;
+  total: number;
 }) {
-  const formatted = date.toLocaleDateString("fr-CH", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  let tone: "bad" | "go" | "done";
+  let action: string;
+
+  if (expired.length > 0) {
+    tone = "bad";
+    action = `« ${expired[0].name} » a expiré. Refaites-le avant d'envoyer le dossier.`;
+  } else if (allDone) {
+    tone = "done";
+    action = "Tous vos documents sont rassemblés. Vous pouvez envoyer votre dossier.";
+  } else if (nextDoc) {
+    tone = "go";
+    action = `Prochaine action : obtenir « ${nextDoc.name} ».`;
+  } else if (!slowReady) {
+    tone = "go";
+    action = "Continuez à obtenir vos documents de l'étape 1.";
+  } else {
+    tone = "go";
+    action = "Demandez maintenant les attestations de l'étape 2 (valables 3 mois).";
+  }
+
+  const styles = {
+    bad: "border-brand-200 bg-brand-50",
+    go: "border-ink-300/50 bg-slate-50",
+    done: "border-emerald-200 bg-emerald-50",
+  }[tone];
+
   return (
-    <div
-      className={`rounded-xl border p-3 text-sm ${
-        blockers > 0
-          ? "border-brand-200 bg-brand-50"
-          : ready
-            ? "border-emerald-200 bg-emerald-50"
-            : "border-amber-200 bg-amber-50"
-      }`}
-    >
-      <div className="text-xs uppercase tracking-wide text-ink-500">
-        Date d'envoi sûre estimée
-      </div>
-      <div className="mt-0.5 text-lg font-bold text-ink-900">{formatted}</div>
-      <div className="text-xs text-ink-600">
-        {blockers > 0
-          ? "Un document a expiré, à corriger."
-          : ready
-            ? "Documents lents prêts : vous pouvez demander les attestations."
-            : "En attente des documents lents."}
+    <div className={`rounded-2xl border p-5 ${styles}`}>
+      <p className="text-base font-medium text-ink-900">{action}</p>
+
+      {!allDone && tone !== "bad" && safeDate && (
+        <p className="mt-1.5 text-sm text-ink-600">
+          En suivant cet ordre, vous pourrez envoyer votre dossier vers le{" "}
+          <span className="font-semibold text-ink-900">{formatDate(safeDate)}</span>.
+        </p>
+      )}
+
+      <div className="mt-4 flex items-center gap-3">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/70">
+          <div
+            className="h-full rounded-full bg-brand-500 transition-all"
+            style={{ width: `${(obtainedCount / total) * 100}%` }}
+          />
+        </div>
+        <span className="shrink-0 text-xs font-medium text-ink-600">
+          {obtainedCount} / {total} obtenus
+        </span>
       </div>
     </div>
   );
 }
+
+function Group({
+  index,
+  title,
+  hint,
+  locked,
+  children,
+}: {
+  index: number;
+  title: string;
+  hint: string;
+  locked?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-center gap-3">
+        <span
+          className={`flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+            locked ? "bg-ink-300/40 text-ink-500" : "bg-brand-500 text-white"
+          }`}
+        >
+          {index}
+        </span>
+        <h2 className="text-lg font-semibold text-ink-900">{title}</h2>
+      </div>
+      <p className="mt-2 pl-10 text-sm text-ink-500">{hint}</p>
+      <div className="mt-4 space-y-3">{children}</div>
+    </section>
+  );
+}
+
