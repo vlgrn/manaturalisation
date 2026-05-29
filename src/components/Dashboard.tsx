@@ -7,7 +7,7 @@ import { hasPaid, markPaid } from "@/lib/payment";
 import { useUser, signOut } from "@/lib/useUser";
 import { supabaseConfigured } from "@/lib/env";
 import { Paywall } from "@/components/Paywall";
-import { GoogleSignIn } from "@/components/GoogleSignIn";
+import { AuthForm } from "@/components/AuthForm";
 import { DocRow } from "@/components/DocRow";
 import { StepTimeline } from "@/components/StepTimeline";
 import { CostsPanel } from "@/components/CostsPanel";
@@ -30,10 +30,10 @@ function SignInGate() {
         Accédez à votre dossier
       </h1>
       <p className="mt-2 text-ink-600">
-        Connectez-vous pour retrouver le suivi de vos documents, en sécurité.
+        Connectez-vous ou créez un compte gratuit pour suivre vos documents.
       </p>
       <div className="mt-8 w-full">
-        <GoogleSignIn next="/tableau-de-bord" />
+        <AuthForm next="/tableau-de-bord" />
       </div>
       <p className="mt-4 text-xs text-ink-500">
         Aucune donnée n&apos;est partagée avec l&apos;administration.
