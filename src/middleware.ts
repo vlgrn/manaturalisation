@@ -4,6 +4,14 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 // Refreshes the Supabase auth session on each request and keeps the session
 // cookie in sync. No-op when Supabase isn't configured.
 export async function middleware(request: NextRequest) {
+  // Safety net: if an OAuth/PKCE code lands on the root (because Supabase fell
+  // back to the Site URL), forward it to the callback so the session exchanges.
+  if (request.nextUrl.pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const callbackUrl = request.nextUrl.clone();
+    callbackUrl.pathname = "/auth/callback";
+    return NextResponse.redirect(callbackUrl);
+  }
+
   let response = NextResponse.next({ request });
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

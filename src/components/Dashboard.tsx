@@ -8,6 +8,7 @@ import { useUser, signOut } from "@/lib/useUser";
 import { supabaseConfigured } from "@/lib/env";
 import { Paywall } from "@/components/Paywall";
 import { AuthForm } from "@/components/AuthForm";
+import { DocumentUpload } from "@/components/DocumentUpload";
 import { DocRow } from "@/components/DocRow";
 import { StepTimeline } from "@/components/StepTimeline";
 import { CostsPanel } from "@/components/CostsPanel";
@@ -18,6 +19,7 @@ import type { DocumentSpec, UserProgress } from "@/lib/types";
 const RUBRIQUES = [
   { key: "now", label: "À commencer maintenant" },
   { key: "last", label: "À demander en dernier" },
+  { key: "upload", label: "Mes documents" },
   { key: "info", label: "Procédure & coûts" },
 ];
 
@@ -191,6 +193,19 @@ export function Dashboard() {
                   />
                 ))}
               </Group>
+            )}
+
+            {tab === "upload" && (
+              <div>
+                <h2 className="text-lg font-semibold text-ink-900">Mes documents</h2>
+                <p className="mt-2 text-sm text-ink-500">
+                  Déposez vos pièces. Chacune est identifiée automatiquement et reçoit un
+                  badge selon ce qu&apos;elle est et si sa date est encore valable.
+                </p>
+                <div className="mt-5">
+                  <DocumentUpload />
+                </div>
+              </div>
             )}
 
             {tab === "info" && (
