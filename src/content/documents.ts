@@ -9,12 +9,25 @@ import type { DocumentSpec } from "@/lib/types";
  */
 export const DOCUMENTS: DocumentSpec[] = [
   {
-    key: "etat_civil",
+    key: "acte_naissance",
     number: 1,
+    name: "Acte de naissance (pays d'origine)",
+    summary: "Acte de naissance de votre pays d'origine.",
+    detail:
+      "Acte de naissance délivré par votre pays d'origine. Il doit généralement être transmis et enregistré auprès de l'état civil suisse AVANT de pouvoir obtenir l'acte tiré du registre de l'état civil suisse. Selon le pays, une traduction et une légalisation (apostille) peuvent être exigées. À lancer en tout premier : les délais peuvent être longs.",
+    validityMonths: null,
+    speed: "slow",
+    estimatedWeeks: [4, 16],
+    sequenceGroup: "slow_first",
+    action: { type: "self", label: "À demander dans votre pays d'origine" },
+  },
+  {
+    key: "etat_civil",
+    number: 2,
     name: "Acte tiré du registre de l'état civil suisse",
     summary: "Acte d'état civil suisse récent (moins de 6 mois).",
     detail:
-      "Acte établi par votre arrondissement de l'état civil. C'est une procédure payante distincte qui peut prendre plusieurs semaines à plusieurs mois. À commander en tout premier : son délai d'obtention est long alors que sa validité (6 mois) est limitée.",
+      "Acte établi par votre arrondissement de l'état civil. Pour l'obtenir, votre acte de naissance du pays d'origine doit généralement avoir été transmis et enregistré au préalable. C'est une procédure payante distincte qui peut prendre plusieurs semaines à plusieurs mois. Son délai d'obtention est long alors que sa validité (6 mois) est limitée : lancez-le tôt, juste après l'acte de naissance.",
     validityMonths: 6,
     speed: "slow",
     estimatedWeeks: [6, 12],
@@ -50,6 +63,32 @@ export const DOCUMENTS: DocumentSpec[] = [
     estimatedWeeks: [0, 1],
     sequenceGroup: "neutral",
     action: { type: "self", label: "Cabine photo / photographe" },
+  },
+  {
+    key: "contrat_travail",
+    number: 10,
+    name: "Contrat de travail",
+    summary: "Votre contrat de travail en cours (obligatoire).",
+    detail:
+      "Copie de votre contrat de travail actuel. Il atteste votre participation à la vie économique et est obligatoire. Si vous êtes en formation ou indépendant·e, fournissez le justificatif équivalent (attestation de formation, extrait du registre du commerce, etc.).",
+    validityMonths: null,
+    speed: "instant",
+    estimatedWeeks: [0, 1],
+    sequenceGroup: "neutral",
+    action: { type: "self", label: "Copie de votre contrat" },
+  },
+  {
+    key: "bulletins_salaire",
+    number: 11,
+    name: "3 derniers bulletins de salaire",
+    summary: "Vos trois dernières fiches de salaire (obligatoire).",
+    detail:
+      "Les trois derniers bulletins de salaire, qui accompagnent le contrat de travail pour justifier votre situation économique. Obligatoire pour les personnes salariées.",
+    validityMonths: null,
+    speed: "instant",
+    estimatedWeeks: [0, 1],
+    sequenceGroup: "neutral",
+    action: { type: "self", label: "Vos 3 dernières fiches de salaire" },
   },
   {
     key: "afc",
@@ -102,9 +141,9 @@ export const DOCUMENTS: DocumentSpec[] = [
     key: "fide",
     number: 7,
     name: "Certificat de langue fide (B1 oral / A2 écrit)",
-    summary: "Preuve du niveau de français exigé.",
+    summary: "Preuve du niveau de français. Inutile si le français est votre langue maternelle.",
     detail:
-      "Certificat fide ou passeport des langues fide attestant au minimum B1 à l'oral et A2 à l'écrit en français. À obtenir TÔT : l'examen fide ou la procédure de reconnaissance d'un diplôme équivalent peut prendre du temps. Une fois obtenu, il ne périme pas pour la procédure.",
+      "Si le français est votre langue maternelle (par ex. ressortissant·e français·e) ou si vous avez suivi votre scolarité obligatoire en français, vous êtes dispensé·e de ce certificat. Sinon : certificat fide ou passeport des langues fide attestant au minimum B1 à l'oral et A2 à l'écrit. À obtenir TÔT : l'examen fide ou la reconnaissance d'un diplôme équivalent peut prendre du temps. Une fois obtenu, il ne périme pas pour la procédure.",
     validityMonths: null,
     speed: "slow",
     estimatedWeeks: [6, 16],

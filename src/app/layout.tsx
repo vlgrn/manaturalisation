@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { SiteFooter } from "@/components/SiteFooter";
+import { TrialBanner } from "@/components/TrialBanner";
 
 export const metadata: Metadata = {
   title: "MaNaturalisation · Naturalisation à Genève, sans tout recommencer",
@@ -27,6 +28,7 @@ gtag('config', 'G-3ZX54ZFR16');`}
         </Script>
       </head>
       <body className="flex min-h-screen flex-col">
+        <TrialBanner />
         <main className="flex-1">{children}</main>
         <SiteFooter />
       </body>

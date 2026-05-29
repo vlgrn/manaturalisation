@@ -222,13 +222,12 @@ export const PremiumHero = () => {
               variant="outline"
               className="w-full justify-center gap-2 border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white sm:w-auto"
             >
-              <Link href="/tableau-de-bord">Accéder à mon dossier</Link>
+              <Link href="/tableau-de-bord">Démarrer l&apos;essai gratuit</Link>
             </Button>
           </div>
 
-          <p className="text-sm text-white/40">
-            Sans carte bancaire. Le suivi complet se débloque ensuite pour 39 CHF, une
-            seule fois.
+          <p className="text-sm text-white/50">
+            Essai gratuit 24&nbsp;h · sans carte bancaire.
           </p>
         </div>
       </div>

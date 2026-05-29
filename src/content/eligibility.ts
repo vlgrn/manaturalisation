@@ -76,7 +76,7 @@ export const ELIGIBILITY_QUESTIONS: EligibilityQuestion[] = [
     key: "language",
     section: "integration",
     question: "Avez-vous le français au niveau B1 à l'oral et A2 à l'écrit ?",
-    help: "Prouvé par un certificat fide ou équivalent, ou par une scolarité suivie en français.",
+    help: "Si le français est votre langue maternelle, vous êtes dispensé·e du certificat. Sinon : certificat fide ou équivalent, ou scolarité suivie en français.",
     type: "yesno",
   },
   {

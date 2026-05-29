@@ -23,13 +23,13 @@ const defaultFeatures = [
 
 export const Pricing6 = ({
   heading = "Un prix simple",
-  description = "Le test d'éligibilité est gratuit. Le suivi complet de votre dossier se débloque une seule fois.",
+  description = "Essai gratuit de 24 h, sans carte bancaire. Ensuite, un seul paiement débloque le suivi de votre dossier à vie.",
   price = 39,
   currency = "CHF",
   priceSuffix = "paiement unique",
   features = defaultFeatures,
-  buttonText = "Commencer par le test gratuit",
-  href = "/eligibilite",
+  buttonText = "Démarrer l'essai gratuit",
+  href = "/tableau-de-bord",
 }: Pricing6Props) => {
   return (
     <section id="prix" className="py-16 md:py-24">
@@ -66,6 +66,9 @@ export const Pricing6 = ({
             <Button asChild size="lg">
               <Link href={href}>{buttonText}</Link>
             </Button>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              24 h d&apos;essai · sans carte bancaire
+            </p>
           </div>
         </div>
       </div>
