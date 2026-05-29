@@ -58,7 +58,7 @@ export function AuthForm({ next = "/tableau-de-bord" }: { next?: string }) {
 
   return (
     <div className="w-full">
-      <GoogleSignIn next={next} />
+      <GoogleSignIn next={next} comingSoon />
 
       <div className="my-5 flex items-center gap-3 text-xs text-ink-400">
         <span className="h-px flex-1 bg-ink-300/60" />

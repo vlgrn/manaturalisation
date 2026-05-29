@@ -64,3 +64,24 @@ create policy "documents - delete own" on storage.objects
   for delete using (
     bucket_id = 'documents' and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+-- 5. Per-user dossier progress (document statuses + step statuses), one row per user.
+create table if not exists public.user_progress (
+  user_id     uuid primary key references auth.users (id) on delete cascade,
+  progress    jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now()
+);
+
+alter table public.user_progress enable row level security;
+
+drop policy if exists "progress - select own" on public.user_progress;
+create policy "progress - select own" on public.user_progress
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "progress - insert own" on public.user_progress;
+create policy "progress - insert own" on public.user_progress
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "progress - update own" on public.user_progress;
+create policy "progress - update own" on public.user_progress
+  for update using (auth.uid() = user_id);

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useProgress } from "@/lib/useProgress";
 import { hasPaid, markPaid } from "@/lib/payment";
 import { useUser, signOut } from "@/lib/useUser";
+import { useUserDocuments, type UserDoc } from "@/lib/useUserDocuments";
 import { supabaseConfigured } from "@/lib/env";
 import { Paywall } from "@/components/Paywall";
 import { AuthForm } from "@/components/AuthForm";
@@ -19,7 +20,6 @@ import type { DocumentSpec, UserProgress } from "@/lib/types";
 const RUBRIQUES = [
   { key: "now", label: "À commencer maintenant" },
   { key: "last", label: "À demander en dernier" },
-  { key: "upload", label: "Mes documents" },
   { key: "info", label: "Procédure & coûts" },
 ];
 
@@ -47,8 +47,23 @@ function SignInGate() {
 export function Dashboard() {
   const { progress, setDocStatus, setDocDate, setStepStatus } = useProgress();
   const { user, loading: authLoading } = useUser();
+  const documents = useUserDocuments();
   const [paid, setPaid] = useState<boolean | null>(null);
   const [tab, setTab] = useState<string>("now");
+
+  // Best detected upload per canonical document key (docs are sorted newest-first).
+  const detectedByKey = useMemo(() => {
+    const map = new Map<string, UserDoc>();
+    for (const d of documents.docs) {
+      if (d.status === "done" && d.doc_key) {
+        const existing = map.get(d.doc_key);
+        if (!existing || (existing.is_valid === false && d.is_valid !== false)) {
+          map.set(d.doc_key, d);
+        }
+      }
+    }
+    return map;
+  }, [documents.docs]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -115,12 +130,12 @@ export function Dashboard() {
       <h1 className="text-3xl font-semibold tracking-tight text-ink-900">Mon dossier</h1>
       <p className="mt-2 max-w-2xl text-ink-600">
         Suivez l&apos;ordre indiqué pour qu&apos;aucun document ne périme avant l&apos;envoi.
-        Tout est enregistré sur cet appareil.
+        Votre avancement est enregistré sur votre compte.
       </p>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[340px_1fr] lg:gap-12">
-        {/* Left: summary, sticky */}
-        <div className="lg:sticky lg:top-8">
+        {/* Left: prochaine action + documents */}
+        <div className="space-y-8">
           <StatusBanner
             expired={seq.expired}
             nextDoc={startNow.find((d) => !isObtained(d))}
@@ -130,6 +145,22 @@ export function Dashboard() {
             obtainedCount={obtainedCount}
             total={total}
           />
+
+          <div>
+            <h2 className="text-lg font-semibold text-ink-900">Mes documents</h2>
+            <p className="mt-1 text-sm text-ink-500">
+              Déposez vos pièces : chacune est identifiée et reçoit un badge selon sa
+              validité.
+            </p>
+            <div className="mt-4">
+              <DocumentUpload
+                docs={documents.docs}
+                loaded={documents.loaded}
+                onFiles={documents.uploadFiles}
+                onRemove={documents.remove}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Right: rubriques (one open at a time, no long scroll) */}
@@ -166,6 +197,7 @@ export function Dashboard() {
                     prog={progress.documents[doc.key] ?? { status: "not_started" }}
                     onSetStatus={setDocStatus}
                     onSetDate={setDocDate}
+                    detected={detectedByKey.get(doc.key)}
                   />
                 ))}
               </Group>
@@ -190,22 +222,10 @@ export function Dashboard() {
                     onSetStatus={setDocStatus}
                     onSetDate={setDocDate}
                     muted={!slowReady && (progress.documents[doc.key]?.status ?? "not_started") === "not_started"}
+                    detected={detectedByKey.get(doc.key)}
                   />
                 ))}
               </Group>
-            )}
-
-            {tab === "upload" && (
-              <div>
-                <h2 className="text-lg font-semibold text-ink-900">Mes documents</h2>
-                <p className="mt-2 text-sm text-ink-500">
-                  Déposez vos pièces. Chacune est identifiée automatiquement et reçoit un
-                  badge selon ce qu&apos;elle est et si sa date est encore valable.
-                </p>
-                <div className="mt-5">
-                  <DocumentUpload />
-                </div>
-              </div>
             )}
 
             {tab === "info" && (

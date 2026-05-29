@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ExternalLink, Mail } from "lucide-react";
+import { Check, ChevronDown, ExternalLink, Mail, TriangleAlert } from "lucide-react";
 import { MAILTO_TEMPLATES } from "@/content/documents";
 import type { DocProgress, DocStatus, DocumentSpec } from "@/lib/types";
 import { formatDate, parseDate } from "@/lib/sequencer";
@@ -19,12 +19,14 @@ export function DocRow({
   onSetStatus,
   onSetDate,
   muted = false,
+  detected,
 }: {
   doc: DocumentSpec;
   prog: DocProgress;
   onSetStatus: (key: string, status: DocStatus) => void;
   onSetDate: (key: string, field: "requestedDate" | "obtainedDate", iso: string) => void;
   muted?: boolean;
+  detected?: { is_valid: boolean | null };
 }) {
   const [open, setOpen] = useState(false);
   const status = prog.status ?? "not_started";
@@ -49,7 +51,21 @@ export function DocRow({
         <StatusDot status={status} />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <h4 className="font-medium leading-snug text-ink-900">{doc.name}</h4>
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="font-medium leading-snug text-ink-900">{doc.name}</h4>
+              {detected &&
+                (detected.is_valid === false ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                    <TriangleAlert className="size-3" strokeWidth={2.5} />
+                    Détecté · périmé
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                    <Check className="size-3" strokeWidth={2.5} />
+                    Détecté
+                  </span>
+                ))}
+            </div>
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}

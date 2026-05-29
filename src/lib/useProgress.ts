@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { loadProgress, saveProgress } from "@/lib/storage";
+import { loadProgress, saveProgress, loadProgressRemote, saveProgressRemote } from "@/lib/storage";
 import { getDocument } from "@/content/documents";
 import { computeExpiry } from "@/lib/sequencer";
 import type { DocStatus, StepStatus, UserProgress } from "@/lib/types";
@@ -10,7 +10,14 @@ export function useProgress() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
 
   useEffect(() => {
+    // Local first (instant), then let a saved remote copy win if present.
     setProgress(loadProgress());
+    loadProgressRemote().then((remote) => {
+      if (remote) {
+        setProgress(remote);
+        saveProgress(remote);
+      }
+    });
   }, []);
 
   const persist = useCallback((next: UserProgress) => {
@@ -46,6 +53,7 @@ export function useProgress() {
           documents: { ...prev.documents, [docKey]: next },
         };
         saveProgress(updated);
+        void saveProgressRemote(updated);
         return updated;
       });
     },
@@ -67,6 +75,7 @@ export function useProgress() {
           documents: { ...prev.documents, [docKey]: next },
         };
         saveProgress(updated);
+        void saveProgressRemote(updated);
         return updated;
       });
     },

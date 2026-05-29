@@ -3,9 +3,32 @@
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
-export function GoogleSignIn({ next = "/tableau-de-bord" }: { next?: string }) {
+export function GoogleSignIn({
+  next = "/tableau-de-bord",
+  comingSoon = false,
+}: {
+  next?: string;
+  comingSoon?: boolean;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  if (comingSoon) {
+    return (
+      <button
+        type="button"
+        disabled
+        title="Disponible prochainement"
+        className="inline-flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-xl border border-ink-300 bg-white px-5 py-3 font-medium text-ink-400"
+      >
+        <GoogleIcon />
+        Continuer avec Google
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-ink-500">
+          bientôt
+        </span>
+      </button>
+    );
+  }
 
   async function handle() {
     const supabase = createSupabaseBrowserClient();

@@ -3,6 +3,8 @@
 import { ADULT_DOCUMENTS } from "@/content/documents";
 import { STEPS } from "@/content/steps";
 import type { UserProgress } from "@/lib/types";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { supabaseConfigured } from "@/lib/env";
 
 // Client-side progress store.
 //
@@ -53,4 +55,47 @@ export function saveProgress(progress: UserProgress): void {
 export function resetProgress(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(STORAGE_KEY);
+}
+
+/** Merge a partial progress object (e.g. from Supabase) with the current defaults. */
+export function mergeWithDefaults(parsed: Partial<UserProgress>): UserProgress {
+  const base = emptyProgress();
+  return {
+    documents: { ...base.documents, ...(parsed.documents ?? {}) },
+    steps: { ...base.steps, ...(parsed.steps ?? {}) },
+    eligibilityAnswers: parsed.eligibilityAnswers,
+    eligibilityResult: parsed.eligibilityResult,
+  };
+}
+
+// ---------- Supabase sync (when configured + signed in) ----------
+
+export async function loadProgressRemote(): Promise<UserProgress | null> {
+  if (!supabaseConfigured) return null;
+  const supabase = createSupabaseBrowserClient();
+  if (!supabase) return null;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase
+    .from("user_progress")
+    .select("progress")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!data?.progress) return null;
+  return mergeWithDefaults(data.progress as Partial<UserProgress>);
+}
+
+export async function saveProgressRemote(progress: UserProgress): Promise<void> {
+  if (!supabaseConfigured) return;
+  const supabase = createSupabaseBrowserClient();
+  if (!supabase) return;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from("user_progress")
+    .upsert({ user_id: user.id, progress }, { onConflict: "user_id" });
 }
