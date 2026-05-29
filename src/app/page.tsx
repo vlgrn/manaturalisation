@@ -5,6 +5,7 @@ import { Features } from "@/components/ui/features-8";
 import { Pricing6 } from "@/components/ui/pricing-6";
 import { HeroHighlight, Highlight } from "@/components/ui/hero-highlight";
 import { Faq } from "@/components/ui/faq";
+import { Testimonials } from "@/components/ui/unique-testimonial";
 import { CONDITIONS } from "@/content/conditions";
 
 const FAQ = [
@@ -131,6 +132,19 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Anonymised testimonials — selling sentences only */}
+      <section className="border-t bg-slate-50 py-16 md:py-28">
+        <div className="container max-w-3xl">
+          <p className="text-center text-xs font-medium uppercase tracking-[0.25em] text-ink-500">
+            Témoignages
+          </p>
+          <h2 className="mt-3 text-center text-3xl font-semibold tracking-tight text-ink-900 lg:text-5xl">
+            Ils ont déposé sans rien refaire
+          </h2>
+          <Testimonials />
         </div>
       </section>
 
